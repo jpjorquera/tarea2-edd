@@ -68,7 +68,12 @@ void asignar(tNodo *base, pol polinom, unsigned int half){
             asignar(base->izq, polinom, half);
         }
         else {
-            half += half/2;
+            if (half == 1){
+                half+=1;
+            }
+            else {
+                half += half / 2;
+            }
             asignar(base->der, polinom, half);
         }
     }
