@@ -82,7 +82,6 @@ unsigned int power(int x, unsigned int y)
 tABB initialize(int cantPol){
     tABB tree;
     tree.raiz = (tNodo *)malloc(sizeof(tNodo));
-    int i;
     unsigned int h = 0;
     unsigned int nodos = 0;
     while (cantPol > nodos){                    //Calcular hijos de cada nivel
@@ -181,9 +180,20 @@ void liberar_arbol(tNodo *base){
     free(base);
 }
 
+/*****
+* tNodo movetopost
+******
+* recorre el arbol hasta llegar al polinomio deseado
+******
+* Input:
+3
+* tABB arbol : arbol binario que contiene a todos los polinomios leidos
+* int posicion : la posicion a la cual se desea llegar
+******
+* Returns:
+* tNodo, retorna el nodo que se encuentra en la posicion deseada
+*****/
 tNodo *movetopost(tABB arbol, int posicion){
-    int i;
-    printf("%d\n",posicion);
     if (posicion < 0) return NULL;
     tNodo *auxiliar = (tNodo *)malloc(sizeof(tNodo *));
     auxiliar = arbol.raiz;
@@ -201,12 +211,43 @@ tNodo *movetopost(tABB arbol, int posicion){
     return auxiliar;
 }
 
+/*****
+* void intercambiar
+******
+* intercambia la posición de dos valores de un arreglo
+******
+* Input:
+3
+* int * A : arreglo con los valores
+* int i : posicion del arreglo que se quiere cambiar
+* int j : posicion del arreglo que se quiere cambiar
+******
+* Returns:
+* void
+*****/
 void intercambiar (int * A, int i, int j){
     int tmp = A[i];
     A[i] = A[j];
     A[j] = tmp;
 }
 
+/*****
+* void ordenarpol
+******
+* ordena un polinomio de forma descendente con respecto a sus exponentes, el polinomio ordenado es de tipo [[1,2],[a,b]], 
+  en donde 1 y a corresponden a exp y 2 y b corresponden a coef
+******
+* Input:
+3
+* int * A : arreglo de exponentes sin orden
+* int * A : arreglo de coeficientes relacionados por posición a los exponentes anteriores
+* int N : tamaño de cada arreglo(es el mismo para ambos)
+* int arreglo[][2] : arreglo vacio al que se le ingresaran exp y coef ordenados
+* int *C : copia del arreglo de exponentes(*A), que permanecera inmutable
+******
+* Returns:
+* void
+*****/
 void ordenarpol (int * A, int * B , int N, int arreglo[][2], int * C){
     int i, j, k;
     for (i = 0; i < N - 1; i++)
@@ -227,7 +268,20 @@ void ordenarpol (int * A, int * B , int N, int arreglo[][2], int * C){
     }
 }
 
-
+/*****
+* float evaluar
+******
+* evalua el polinomio a traves del algoritmo de horner, segun el valor pedido
+******
+* Input:
+3
+* tABB arbol : arbol binario que contiene a todos los polinomios
+* int posicion : posicion del polinomio que se quiere evaluar
+* float evaluado : el valor al cual se quiere evaluar el polinomio de la posicion determinada
+******
+* Returns:
+* float, resultado numerico de la evaluacion del polinomio
+*****/
 float evaluar(tABB arbol, int posicion, float evaluado){
     tNodo *act= movetopost(arbol, posicion);
     pol elemento = act->valor_polinomio;
@@ -240,14 +294,13 @@ float evaluar(tABB arbol, int posicion, float evaluado){
         exponen2[z]=elemento.exponente[z];
         coee[z]=elemento.coeficiente[z];
     }
-    int tamanoo= sizeof(exponen)/4;
-    int elem[tamanoo][2];
-    ordenarpol(exponen2, coee, tamanoo, elem, exponen);
+    int elem[elemento.tam][2];
+    ordenarpol(exponen2, coee, elemento.tam, elem, exponen);
     float raiz = 0;
     float coef = elem[0][1];
     float poli = coef + raiz;
-    int i=1;
-    for(i;i<sizeof(elem)/8;i++){
+    int i;
+    for(i=1;i<sizeof(elem)/4;i++){
         int a = elem[i-1][0]-elem[i][0];
         if(a!=1){
             while(a>1){
@@ -263,17 +316,29 @@ float evaluar(tABB arbol, int posicion, float evaluado){
             poli = coef + raiz;
         }
     }
-    int cortar = 1000000*poli;
-    float mandar = cortar/1000000;
     return poli;
 }
 
 
+/*****
+* int coeficiente
+******
+* obtiene el valor del coeficiente que acompaña al monomio de grado requerido
+******
+* Input:
+3
+* tABB arbol : arbol binario con los polinomios
+* int pos : posición del polinomio que se quiere evaluar
+* int expo : valor del exponente que va acompañado del coeficiente requerido
+******
+* Returns:
+* int, retorna el valor del coeficiente pedido, si no existe el monomio del coeficiente, retorna 0
+*****/
 float coeficiente(tABB arbol, int pos, float expo){
     tNodo *act= movetopost(arbol, pos);
     pol elemento = act->valor_polinomio;
-    int i=0;
-    for(i;i<sizeof(elemento.exponente)/4;i++){
+    int i;
+    for(i=0;i<elemento.tam;i++){
         if(elemento.exponente[i]==expo){
             float res = elemento.coeficiente[i];
             return res;
@@ -313,18 +378,18 @@ int main(){
     int posleido;
     float valorleido;
     FILE *salida;
-    salida=fopen("salidaPolinomio.txt","w");
-    fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);
-    while(!feof(archivo)){
-        if (strncmp(funcion,pp1,7)==0){
-            float resul = evaluar(arbol, posleido, valorleido);
-            fprintf(salida,"%.6f\n",resul);
+    salida=fopen("salidaPolinomio.txt","w");                                      //crea el archivo de salida
+    fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);                   //lee archivo y almacena los valores en las valiares asignadas
+    while(!feof(archivo)){                                                        //comprueba que no se haya llegado al EOF
+        if (strncmp(funcion,pp1,7)==0){                                           //verifica si lo que se pide es EVALUAR
+            float resul = evaluar(arbol, posleido, valorleido);                   //evalua segun lo pedido
+            fprintf(salida,"%.6f\n",resul);                                       //escribe el resultado en el texto de salida
         }
-        else if(strncmp(funcion,pp2,11)==0){
-            int resul = coeficiente(arbol, posleido, valorleido);
-            fprintf(salida,"%d\n",resul);
+        else if(strncmp(funcion,pp2,11)==0){                                      //verifica si lo que se pide es COEFICIENTE
+            int resul = coeficiente(arbol, posleido, valorleido);                 //aplica la funcion segun lo pedido
+            fprintf(salida,"%d\n",resul);                                         //escribe el resultado en el texto de salida
         }
-        fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);
+        fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);               //lee la siguiente linea del archivo
     }
     fclose(salida);
     fclose(archivo);
