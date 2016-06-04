@@ -307,7 +307,6 @@ int main(){
         asignar(arbol.raiz, polinom, half);             //Asignar en el arbol
     }
     limpiar(arbol.raiz);                                //Limpiar nodos inutilizados
-    int a = 0;
     char funcion[13];
     char pp1[]="EVALUAR";
     char pp2[]="COEFICIENTE";
