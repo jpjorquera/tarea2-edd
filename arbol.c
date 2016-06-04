@@ -2,24 +2,184 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct polinomio {
-    int tam;
-    int pos;
+typedef struct polinomio {          //Estructura que almacena
+    int tam;                        // tamano, posicion de ingreso
+    int pos;                        // exponentes y coeficientes del polinomio
     unsigned int *exponente;
     int *coeficiente;
 } pol;
 
-typedef struct node {
+typedef struct node {           //Nodo tipo arbol
     pol valor_polinomio;
     struct node *izq;
     struct node *der;
 
 } tNodo;
 
-typedef struct abb {
+typedef struct abb {        //Arbol incluyendo nodo raiz y tamano
     tNodo *raiz;
     int Size;
 } tABB;
+
+/*****
+* void crear_arbol
+******
+* Crea arbol completo (niveles llenos) segun la cantidad de nodos necesitados
+******
+* Input:
+* tNodo * base : nodo que se asigna a cada padre, incluyendo a la raiz
+* unsigned int cant_hijos : cantidad de hijos posibles de la base actual
+******
+* Returns:
+* void
+*****/
+void crear_arbol(tNodo *base, unsigned int cant_hijos){
+    if (cant_hijos == 0 ){                          //Si no hay hijos
+        base->izq = NULL;
+        base->der = NULL;
+        return;
+    }
+    base->izq = (tNodo *)malloc(sizeof(tNodo));
+    cant_hijos = cant_hijos/2-1;
+    base->der = (tNodo *)malloc(sizeof(tNodo));     //Iterar sobre hijos
+    crear_arbol(base->izq, cant_hijos);
+    crear_arbol(base->der, cant_hijos);
+}
+
+/*****
+* unsigned int power
+******
+* Calcular potencia de un numero
+******
+* Input:
+* int x : base de la potencia
+* unsigned int y : exponente de la potencia
+******
+* Returns:
+* unsigned int, valor final de la potencia
+*****/
+unsigned int power(int x, unsigned int y)
+{
+    if( y == 0)
+        return 1;
+    else if (y%2 == 0)
+        return power(x, y/2)*power(x, y/2);
+    else
+        return x*power(x, y/2)*power(x, y/2);
+}
+
+/*****
+* tABB initialize
+******
+* Inicializar la lista vacia segun la cantidad de polinomios (nodos) necesitados
+******
+* Input:
+* int cantPol : cantidad de polinomios, se necesitan para calcular el maximo de hijos a crear
+******
+* Returns:
+* tABB, arbol ya creado vacia e inicializado
+*****/
+tABB initialize(int cantPol){
+    tABB tree;
+    tree.raiz = (tNodo *)malloc(sizeof(tNodo));
+    int i;
+    unsigned int h = 0;
+    unsigned int nodos = 0;
+    while (cantPol > nodos){                    //Calcular hijos de cada nivel
+        nodos += power(2, h++);
+    }
+    crear_arbol(tree.raiz, nodos-1);
+    return tree;
+}
+
+/*****
+* void asignar
+******
+* Asignar el polinomio segun su posicion para una busqueda eficiente (AVL)
+******
+* Input:
+* tNodo * base : puntero a la base (o raiz) del nodo actual a asignar
+* pol polinom : informacion del polinomio a guardar en cada nodo
+* unsigned int half : mitad del total de polinomios para asignar a base
+******
+* Returns:
+* void
+*****/
+void asignar(tNodo *base, pol polinom, unsigned int half){
+    if (half == polinom.pos){                   //Si polinomio actual corresponde a la mitad
+        base->valor_polinomio = polinom;        //Asignar en el lugar
+        return;
+    }
+    else {
+        if (polinom.pos < half) {               //Comparar para asignar izquierda o derecha
+            half /= 2;                          // recalcular mitad
+            asignar(base->izq, polinom, half);
+        }
+        else {
+            if (half == 1){                     //Caso mitad decimal
+                half+=1;
+            }
+            else {
+                half += half / 2;
+            }
+            asignar(base->der, polinom, half);
+        }
+    }
+}
+
+/*****
+* void limpiar
+******
+* Busca en el arbol completo los nodos vacios para eliminarlos
+******
+* Input:
+* tNodo base : raiz de donde empezar la busqueda
+******
+* Returns:
+* void
+*****/
+void limpiar(tNodo *base){
+    if (base->izq != NULL) {                            //Verificar al no ser NULL
+        if (base->izq->valor_polinomio.tam == 0) {      //Verificar nodo "vacio"
+            free(base->izq);                            //Eliminar nodo
+            base->izq = NULL;
+        }
+        else {
+            limpiar(base->izq);
+        }
+    }
+    if (base->der != NULL) {
+        if (base->der->valor_polinomio.tam == 0) {
+            free(base->der);
+            base->der = NULL;
+        }
+        else {
+            limpiar(base->der);
+        }
+    }
+}
+
+/*****
+* void liberar_arbol
+******
+* Liberar memoria correspondiente al arbol
+******
+* Input:
+* tNodo base : raiz del arbol a liberar;
+******
+* Returns:
+* void
+*****/
+void liberar_arbol(tNodo *base){
+    if (base == NULL){          //Caso base
+        return;
+    }
+    liberar_arbol(base->izq);                    //Buscar
+    liberar_arbol(base->der);
+    free(base->valor_polinomio.coeficiente);
+    free(base->valor_polinomio.exponente);
+    free(base);
+}
 
 tNodo *movetopost(tABB arbol, int posicion){
     int i;
@@ -122,118 +282,32 @@ float coeficiente(tABB arbol, int pos, float expo){
     return 0;
 }
 
-
-int crear_hijos(tNodo *base, unsigned int cant_hijos){
-    if (cant_hijos == 0 ){
-        base->izq = NULL;
-        base->der = NULL;
-        return 1;
-    }
-    base->izq = (tNodo *)malloc(sizeof(tNodo));
-    cant_hijos = cant_hijos/2-1;
-    base->der = (tNodo *)malloc(sizeof(tNodo));
-    crear_hijos(base->izq, cant_hijos);
-    crear_hijos(base->der, cant_hijos);
-}
-
-unsigned int power(int x, unsigned int y)
-{
-    if( y == 0)
-        return 1;
-    else if (y%2 == 0)
-        return power(x, y/2)*power(x, y/2);
-    else
-        return x*power(x, y/2)*power(x, y/2);
-
-}
-
-tABB initialize(int cantPol){
-    tABB tree;
-    tree.raiz = (tNodo *)malloc(sizeof(tNodo));
-    int i;
-    unsigned int h = 0;
-    unsigned int nodos = 0;
-    while (cantPol > nodos){
-        nodos += power(2, h++);
-    }
-    crear_hijos(tree.raiz, nodos-1);
-    return tree;
-}
-
-void asignar(tNodo *base, pol polinom, unsigned int half){
-    if (half == polinom.pos){
-        base->valor_polinomio = polinom;
-        return;
-    }
-    else {
-        if (polinom.pos < half) {
-            half /= 2;
-            asignar(base->izq, polinom, half);
-        }
-        else {
-            if (half == 1){
-                half+=1;
-            }
-            else {
-                half += half / 2;
-            }
-            asignar(base->der, polinom, half);
-        }
-    }
-}
-
-void limpiar(tNodo *base){
-    if (base->izq != NULL) {
-        if (base->izq->valor_polinomio.tam == 0) {
-            tNodo *aux;
-            aux = base->izq;
-            base->izq = NULL;
-            free(aux);
-        }
-        else {
-            limpiar(base->izq);
-        }
-    }
-    if (base->der != NULL) {
-        if (base->der->valor_polinomio.tam == 0) {
-            tNodo *aux;
-            aux = base->der;
-            base->der = NULL;
-            free(aux);
-        }
-        else {
-            limpiar(base->der);
-        }
-    }
-}
-
-
-
-void main(){
-    FILE *archivo = fopen("entradaPolinomio.txt", "r");
+int main(){
+    FILE *archivo = fopen("entradaPolinomio.txt", "r");        //Entrada
     int cant_pol;
     int i, tam_pol, j;
     unsigned int exp, coef, half;
-    fscanf(archivo, "%d", &cant_pol);
+    fscanf(archivo, "%d", &cant_pol);                //Leer cantidad de polinomios
     tABB arbol;
     arbol = initialize(cant_pol);
     arbol.Size = cant_pol;
     for (i=0; i<cant_pol; i++){
         fscanf(archivo, "%d", &tam_pol);
-        pol polinom;
+        pol polinom;                                //Crear polinomomio actual tipo pol
         polinom.tam = tam_pol;
         polinom.pos = i;
         polinom.exponente = (unsigned int *)malloc(sizeof(unsigned int)* tam_pol);
         polinom.coeficiente = (int *)malloc(sizeof(int)* tam_pol);
-        for (j=0; j<tam_pol; j++){
+        for (j=0; j<tam_pol; j++){                      //Crear arreglos de exponente y coeficientes
             fscanf(archivo, "%u %u", &exp, &coef);
             polinom.exponente[j] = exp;
             polinom.coeficiente[j] = coef;
         }
         half = (unsigned int) (cant_pol / 2);
-        asignar(arbol.raiz, polinom, half);
+        asignar(arbol.raiz, polinom, half);             //Asignar en el arbol
     }
-    limpiar(arbol.raiz);
+    limpiar(arbol.raiz);                                //Limpiar nodos inutilizados
+    int a = 0;
     char funcion[13];
     char pp1[]="EVALUAR";
     char pp2[]="COEFICIENTE";
@@ -255,4 +329,6 @@ void main(){
     }
     fclose(salida);
     fclose(archivo);
+    liberar_arbol(arbol.raiz);
+    return 1;
 }
