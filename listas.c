@@ -66,7 +66,6 @@ void free_linked(tNodo *base){
 * recorre la lista enlazada hasta llegar al polinomio deseado
 ******
 * Input:
-3
 * tLista lista : lista enlazad que contiene a todos los polinomios leidos
 * int posicion : la posicion a la cual se desea llegar
 ******
@@ -92,7 +91,6 @@ tNodo *movetopost(tLista lista, int posicion){
 * intercambia la posición de dos valores de un arreglo
 ******
 * Input:
-3
 * int * A : arreglo con los valores
 * int i : posicion del arreglo que se quiere cambiar
 * int j : posicion del arreglo que se quiere cambiar
@@ -113,7 +111,6 @@ void intercambiar (int * A, int i, int j){
   en donde 1 y a corresponden a exp y 2 y b corresponden a coef
 ******
 * Input:
-3
 * int * A : arreglo de exponentes sin orden
 * int * A : arreglo de coeficientes relacionados por posición a los exponentes anteriores
 * int N : tamaño de cada arreglo(es el mismo para ambos)
@@ -149,7 +146,6 @@ void ordenarpol (int * A, int * B , int N, int arreglo[][2], int * C){
 * evalua el polinomio a traves del algoritmo de horner, segun el valor pedido
 ******
 * Input:
-3
 * tLista lista : lista enlazada que contiene a todos los polinomios
 * int posicion : posicion del polinomio que se quiere evaluar
 * float evaluado : el valor al cual se quiere evaluar el polinomio de la posicion determinada
@@ -201,7 +197,6 @@ float evaluar(tLista lista, int posicion, float evaluado){
 * obtiene el valor del coeficiente que acompaña al monomio de grado requerido
 ******
 * Input:
-3
 * tLista lista : lista enlazada con los polinomios
 * int pos : posición del polinomio que se quiere evaluar
 * int expo : valor del exponente que va acompañado del coeficiente requerido
