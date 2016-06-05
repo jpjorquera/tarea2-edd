@@ -2,19 +2,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct polinomio {          //Estructura polinomio
-    int tam;                        // Almacena tamano, exponentes y coeficientes del polinomio
+typedef struct polinomio {          // Estructura polinomio
+    int tam;                        //  Almacena tamano, exponentes y coeficientes del polinomio
     unsigned int *exponente;
     int *coeficiente;
 } pol;
 
-typedef struct node {               //Estructura nodo de lista enlazada
-    pol valor_polinomio;            //Lleva el polinomio como su valor
+typedef struct node {               // Estructura nodo de lista enlazada
+    pol valor_polinomio;            // Lleva el polinomio como su valor
     struct node *next;
 } tNodo;
 
-typedef struct lista {              //Estructura lista
-    tNodo *head;                    //Almacena la cabeza de la lista enlazada
+typedef struct lista {              // Estructura lista
+    tNodo *head;                    // Almacena la cabeza de la lista enlazada
 } tLista;
 
 /*****
@@ -29,11 +29,36 @@ typedef struct lista {              //Estructura lista
 * tlista, Devuelve la lista ya inicializada
 *****/
 tLista initialize(tLista lista){
-    lista.head = (tNodo *)malloc(sizeof(tNodo));        //Crear cabeza
+    lista.head = (tNodo *)malloc(sizeof(tNodo));        // Crear cabeza
     lista.head->next = NULL;
     return lista;
 }
 
+/*****
+* void asignar
+******
+* Asigna el polinomio al nodo correspondiente en la lista
+******
+* Input:
+* tNodo * base : nodo cabeza de la lista a asignar
+* pol polinom : polinomio a almacenar en el nodo correspondiente
+ * int pos : posicion en la lista a asignar
+******
+* Returns:
+* void
+*****/
+void asignar(tNodo *base, pol polinom, int pos) {
+    if (pos == 0) {
+        base->valor_polinomio = polinom;                      // Asignar polinomio a la cabeza
+        base->next = NULL;
+    }
+    else {
+        if (base->next == NULL) {
+            base->next = (tNodo *) malloc(sizeof(tNodo));    // Crear siguiente nodo en caso de ser necesario
+        }
+        asignar(base->next, polinom, --pos);                // Iterar en el siguiente
+    }
+}
 /*****
 * void free_linked
 ******
@@ -46,18 +71,17 @@ tLista initialize(tLista lista){
 * void
 *****/
 void free_linked(tNodo *base){
-    if (base->next == NULL){                            //Caso base, final de lista
+    if (base->next == NULL){                            // Caso base, final de lista
         free(base->valor_polinomio.coeficiente);
         free(base->valor_polinomio.exponente);
         free(base);
         return;
     }
-    tNodo *auxiliar = base;
-    base = base->next;                                  //Apuntar siguiente
-    free(auxiliar->valor_polinomio.coeficiente);        //liberar auxiliar
-    free(auxiliar->valor_polinomio.exponente);
-    free(auxiliar);
-    free_linked(base->next);
+    tNodo *auxiliar = base->next;
+    free(base->valor_polinomio.coeficiente);        // liberar auxiliar
+    free(base->valor_polinomio.exponente);
+    free(base);
+    free_linked(auxiliar);
 }
 
 /*****
@@ -72,17 +96,15 @@ void free_linked(tNodo *base){
 * Returns:
 * tNodo, retorna el nodo que se encuentra en la posicion deseada
 *****/
-tNodo *movetopost(tLista lista, int posicion){
+pol movetopost(tLista lista, int posicion){
     int i;
-    if (posicion < 0) return NULL;
-    tNodo *auxiliar = (tNodo *)malloc(sizeof(tNodo *));
-    auxiliar = lista.head;
+    tNodo *auxiliar = lista.head;
     int pos = 0;
     for (i = 0; i < posicion; i++) {
         auxiliar = auxiliar->next;
         pos++;
     }
-    return auxiliar;
+    return auxiliar->valor_polinomio;
 }
 
 /*****
@@ -154,8 +176,7 @@ void ordenarpol (int * A, int * B , int N, int arreglo[][2], int * C){
 * float, resultado numerico de la evaluacion del polinomio
 *****/
 float evaluar(tLista lista, int posicion, float evaluado){
-    tNodo *act= movetopost(lista, posicion);
-    pol elemento = act->valor_polinomio;
+    pol elemento = movetopost(lista, posicion);
     int exponen[elemento.tam];
     int exponen2[elemento.tam];
     int coee[elemento.tam];
@@ -205,8 +226,7 @@ float evaluar(tLista lista, int posicion, float evaluado){
 * int, retorna el valor del coeficiente pedido, si no existe el monomio del coeficiente, retorna 0
 *****/
 int coeficiente(tLista lista, int pos, float expo){
-    tNodo *act= movetopost(lista, pos);
-    pol elemento = act->valor_polinomio;
+    pol elemento = movetopost(lista, pos);
     int i;
     for(i=0;i<sizeof(elemento.exponente)/4;i++){
         if(elemento.exponente[i]==expo){
@@ -218,43 +238,26 @@ int coeficiente(tLista lista, int pos, float expo){
 }
 
 
-void main(){
-    FILE *archivo = fopen("entradaPolinomio.txt", "r");             //Entrada
+int main(){
+    FILE *archivo = fopen("entradaPolinomio.txt", "r");             // Entrada
     int cant_pol;
-    int i, tam_pol, j, k, coef;
+    int i, tam_pol, j, coef;
     unsigned int exp;
-    fscanf(archivo, "%d", &cant_pol);                               //Almacenar cantidad de polinomios
+    fscanf(archivo, "%d", &cant_pol);                               // Almacenar cantidad de polinomios
     tLista lista_pol;
-    lista_pol = initialize(lista_pol);                              //Inicializar lista
+    lista_pol = initialize(lista_pol);                              // Inicializar lista
     pol polinom;
     for (i=0; i<cant_pol; i++){
-        fscanf(archivo, "%d", &tam_pol);                            //Leer tamano polinomio
+        fscanf(archivo, "%d", &tam_pol);                            // Leer tamano polinomio
         polinom.tam = tam_pol;
-        polinom.exponente = (unsigned int *)malloc(sizeof(unsigned int)* tam_pol);  //Crear arreglo exponentes
-        polinom.coeficiente = (int *)malloc(sizeof(int)* tam_pol);                  // y coeficientes
+        polinom.exponente = (unsigned int *)malloc(sizeof(unsigned int)* tam_pol);  // Crear arreglo exponentes
+        polinom.coeficiente = (int *)malloc(sizeof(int)* tam_pol);                  //  y coeficientes
         for (j=0; j<tam_pol; j++){
-            fscanf(archivo, "%u %d", &exp, &coef);              //leer exponentes y coeficientes
+            fscanf(archivo, "%u %d", &exp, &coef);              // leer exponentes y coeficientes
             polinom.exponente[j] = exp;
             polinom.coeficiente[j] = coef;
         }
-        if (i==0) {
-            lista_pol.head->valor_polinomio = polinom;                  //Asignar polinomio a la cabeza
-            lista_pol.head->next = (tNodo *)malloc(sizeof(tNodo));      //Crear siguiente nodo
-            lista_pol.head->next = NULL;
-        }
-        else {
-            k = 0;                                  //Asignar nodos no cabeza
-            tNodo *aux;                             //en la posicion final
-            aux = lista_pol.head;
-            while (aux->next != NULL){
-                aux = aux->next;
-                k++;
-            }
-            aux->next = (tNodo *)malloc(sizeof(tNodo));
-            aux->next->valor_polinomio = polinom;
-            aux->next->next = (tNodo *)malloc(sizeof(tNodo));
-            aux->next->next = NULL;
-        }
+        asignar(lista_pol.head, polinom, i);
     }
     char funcion[13]; 
     char pp1[]="EVALUAR";
@@ -262,21 +265,21 @@ void main(){
     int posleido;
     float valorleido;
     FILE *salida;
-    salida=fopen("salidaPolinomio.txt","w");
-    salida=fopen("salidaPolinomio.txt","w");                                         //crea el archivo de salida
-    fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);                      //lee archivo y almacena los valores en las valiares asignadas
-    while(!feof(archivo)){                                                           //comprobar que no se ha llegado al EOF
-        if (strncmp(funcion,pp1,7)==0){                                              //verifica si lo que se pide es EVALUAR
-            float resul = evaluar(lista_pol, posleido, valorleido);                  //evalua segun lo pedido
-            fprintf(salida,"%.6f\n",resul);                                          //escribe el resultado en el texto de salida
+    salida=fopen("salidaPolinomio.txt","w");                                         // crea el archivo de salida
+    fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);                      // lee archivo y almacena los valores en las valiares asignadas
+    while(!feof(archivo)){                                                           // comprobar que no se ha llegado al EOF
+        if (strncmp(funcion,pp1,7)==0){                                              // verifica si lo que se pide es EVALUAR
+            float resul = evaluar(lista_pol, posleido, valorleido);                  // evalua segun lo pedido
+            fprintf(salida,"%.6f\n",resul);                                          // escribe el resultado en el texto de salida
         }
-        else if(strncmp(funcion,pp2,11)==0){                                         //verifica si lo que se pide es COEFICIENTE
-            int resul = coeficiente(lista_pol, posleido, valorleido);                //aplica la funcion segun lo pedido
-            fprintf(salida,"%d\n",resul);                                            //escribe el resultado en el texto de salida
+        else if(strncmp(funcion,pp2,11)==0){                                         // verifica si lo que se pide es COEFICIENTE
+            int resul = coeficiente(lista_pol, posleido, valorleido);                // aplica la funcion segun lo pedido
+            fprintf(salida,"%d\n",resul);                                            // escribe el resultado en el texto de salida
         }
-        fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);                  //lee la siguiente linea del archivo
+        fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);                  // lee la siguiente linea del archivo
     }
     fclose(salida);
     free_linked(lista_pol.head);
     fclose(archivo);
+    return 1;
 }
