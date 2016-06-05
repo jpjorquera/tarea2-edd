@@ -85,7 +85,7 @@ void free_linked(tNodo *base){
 }
 
 /*****
-* tNodo movetopost
+* pol movetopost
 ******
 * recorre la lista enlazada hasta llegar al polinomio deseado
 ******
@@ -94,7 +94,7 @@ void free_linked(tNodo *base){
 * int posicion : la posicion a la cual se desea llegar
 ******
 * Returns:
-* tNodo, retorna el nodo que se encuentra en la posicion deseada
+* pol, retorna el polinomio que se encuentra en el nodo de la posicion deseada
 *****/
 pol movetopost(tLista lista, int posicion){
     int i;
@@ -186,14 +186,13 @@ float evaluar(tLista lista, int posicion, float evaluado){
     	exponen2[z]=elemento.exponente[z];
     	coee[z]=elemento.coeficiente[z];
     }
-    int tamanoo= sizeof(exponen)/4;
-    int elem[tamanoo][2];
-    ordenarpol(exponen2, coee, tamanoo, elem, exponen);
+    int elem[elemento.tam][2];
+    ordenarpol(exponen2, coee, elemento.tam, elem, exponen);
     float raiz = 0;
     float coef = elem[0][1];
     float poli = coef + raiz;
     int i;
-    for(i=1;i<sizeof(elem)/8;i++){
+    for(i=1;i<elemento.tam;i++){
         int a = elem[i-1][0]-elem[i][0];
         if(a!=1){
             while(a>1){
@@ -228,7 +227,7 @@ float evaluar(tLista lista, int posicion, float evaluado){
 int coeficiente(tLista lista, int pos, float expo){
     pol elemento = movetopost(lista, pos);
     int i;
-    for(i=0;i<sizeof(elemento.exponente)/4;i++){
+    for(i=0;i<elemento.tam;i++){
         if(elemento.exponente[i]==expo){
             float res = elemento.coeficiente[i];
             return res;
