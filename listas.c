@@ -243,8 +243,7 @@ int main(){
     int i, tam_pol, j, coef;
     unsigned int exp;
     fscanf(archivo, "%d", &cant_pol);                               // Almacenar cantidad de polinomios
-    tLista lista_pol;
-    lista_pol = initialize(lista_pol);                              // Inicializar lista
+    tLista lista_pol = initialize(lista_pol);                              // Inicializar lista
     pol polinom;
     for (i=0; i<cant_pol; i++){
         fscanf(archivo, "%d", &tam_pol);                            // Leer tamano polinomio
