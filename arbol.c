@@ -194,8 +194,7 @@ void liberar_arbol(tNodo *base){
 *****/
 tNodo *movetopost(tABB arbol, int posicion){
     if (posicion < 0) return NULL;
-    tNodo *auxiliar = (tNodo *)malloc(sizeof(tNodo *));
-    auxiliar = arbol.raiz;
+    tNodo *auxiliar = arbol.raiz;
     pol aux = auxiliar->valor_polinomio;
     while(aux.pos!=posicion){
         if (posicion<aux.pos){
@@ -279,8 +278,7 @@ void ordenarpol (int * A, int * B , int N, int arreglo[][2], int * C){
 * float, resultado numerico de la evaluacion del polinomio
 *****/
 float evaluar(tABB arbol, int posicion, float evaluado){
-    tNodo *act= movetopost(arbol, posicion);
-    pol elemento = act->valor_polinomio;
+    pol elemento = movetopost(arbol, posicion)->valor_polinomio;
     int exponen[elemento.tam];
     int exponen2[elemento.tam];
     int coee[elemento.tam];
@@ -329,14 +327,12 @@ float evaluar(tABB arbol, int posicion, float evaluado){
 * Returns:
 * int, retorna el valor del coeficiente pedido, si no existe el monomio del coeficiente, retorna 0
 *****/
-float coeficiente(tABB arbol, int pos, float expo){
-    tNodo *act= movetopost(arbol, pos);
-    pol elemento = act->valor_polinomio;
+int coeficiente(tABB arbol, int pos, float expo){
+    pol elemento = movetopost(arbol, pos)->valor_polinomio;
     int i;
     for(i=0;i<elemento.tam;i++){
         if(elemento.exponente[i]==expo){
-            float res = elemento.coeficiente[i];
-            return res;
+            return elemento.coeficiente[i];;
         }
     }
     return 0;
