@@ -229,7 +229,7 @@ int coeficiente(tLista lista, int pos, float expo){
     int i;
     for(i=0;i<elemento.tam;i++){
         if(elemento.exponente[i]==expo){
-            float res = elemento.coeficiente[i];
+            int res = elemento.coeficiente[i];
             return res;
         }
     }
