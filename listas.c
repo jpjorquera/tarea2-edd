@@ -59,6 +59,7 @@ void asignar(tNodo *base, pol polinom, int pos) {
         asignar(base->next, polinom, --pos);                // Iterar en el siguiente
     }
 }
+
 /*****
 * void free_linked
 ******
@@ -235,7 +236,6 @@ int coeficiente(tLista lista, int pos, float expo){
     }
     return 0;
 }
-
 
 int main(){
     FILE *archivo = fopen("entradaPolinomio.txt", "r");             // Entrada
