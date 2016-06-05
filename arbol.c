@@ -294,7 +294,7 @@ float evaluar(tABB arbol, int posicion, float evaluado){
     float coef = elem[0][1];
     float poli = coef + raiz;
     int i;
-    for(i=1;i<sizeof(elem)/4;i++){
+    for(i=1;i<elemento.tam;i++){
         int a = elem[i-1][0]-elem[i][0];
         if(a!=1){
             while(a>1){
@@ -312,7 +312,6 @@ float evaluar(tABB arbol, int posicion, float evaluado){
     }
     return poli;
 }
-
 
 /*****
 * int coeficiente
