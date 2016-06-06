@@ -2,21 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct polinomio {          //Estructura que almacena
+typedef struct polinomio {          // Estructura que almacena
     int tam;                        // tamano, posicion de ingreso
     int pos;                        // exponentes y coeficientes del polinomio
     unsigned int *exponente;
     int *coeficiente;
 } pol;
 
-typedef struct node {           //Nodo tipo arbol
+typedef struct node {           // Nodo tipo arbol
     pol valor_polinomio;
     struct node *izq;
     struct node *der;
 
 } tNodo;
 
-typedef struct abb {        //Arbol incluyendo nodo raiz y tamano
+typedef struct abb {        // Arbol incluyendo nodo raiz y tamano
     tNodo *raiz;
     int Size;
 } tABB;
@@ -34,14 +34,16 @@ typedef struct abb {        //Arbol incluyendo nodo raiz y tamano
 * void
 *****/
 void crear_arbol(tNodo *base, unsigned int cant_hijos){
-    if (cant_hijos == 0 ){                          //Si no hay hijos
+    if (cant_hijos == 0 ){                          // Si no hay hijos
         base->izq = NULL;
         base->der = NULL;
         return;
     }
     base->izq = (tNodo *)malloc(sizeof(tNodo));
+    base->izq->valor_polinomio.tam = 0;
     cant_hijos = cant_hijos/2-1;
-    base->der = (tNodo *)malloc(sizeof(tNodo));     //Iterar sobre hijos
+    base->der = (tNodo *)malloc(sizeof(tNodo));     // Iterar sobre hijos
+    base->der->valor_polinomio.tam = 0;
     crear_arbol(base->izq, cant_hijos);
     crear_arbol(base->der, cant_hijos);
 }
@@ -84,7 +86,7 @@ tABB initialize(int cantPol){
     tree.raiz = (tNodo *)malloc(sizeof(tNodo));
     unsigned int h = 0;
     unsigned int nodos = 0;
-    while (cantPol > nodos){                    //Calcular hijos de cada nivel
+    while (cantPol > nodos){                    // Calcular hijos de cada nivel
         nodos += power(2, h++);
     }
     crear_arbol(tree.raiz, nodos-1);
@@ -105,17 +107,17 @@ tABB initialize(int cantPol){
 * void
 *****/
 void asignar(tNodo *base, pol polinom, unsigned int half){
-    if (half == polinom.pos){                   //Si polinomio actual corresponde a la mitad
-        base->valor_polinomio = polinom;        //Asignar en el lugar
+    if (half == polinom.pos){                   // Si polinomio actual corresponde a la mitad
+        base->valor_polinomio = polinom;        // Asignar en el lugar
         return;
     }
     else {
-        if (polinom.pos < half) {               //Comparar para asignar izquierda o derecha
+        if (polinom.pos < half) {               // Comparar para asignar izquierda o derecha
             half /= 2;                          // recalcular mitad
             asignar(base->izq, polinom, half);
         }
         else {
-            if (half == 1){                     //Caso mitad decimal
+            if (half == 1){                     // Caso mitad decimal
                 half+=1;
             }
             else {
@@ -138,9 +140,9 @@ void asignar(tNodo *base, pol polinom, unsigned int half){
 * void
 *****/
 void limpiar(tNodo *base){
-    if (base->izq != NULL) {                            //Verificar al no ser NULL
-        if (base->izq->valor_polinomio.tam == 0) {      //Verificar nodo "vacio"
-            free(base->izq);                            //Eliminar nodo
+    if (base->izq != NULL) {                            // Verificar al no ser NULL
+        if (base->izq->valor_polinomio.tam == 0) {      // Verificar nodo "vacio"
+            free(base->izq);                            // Eliminar nodo
             base->izq = NULL;
         }
         else {
@@ -170,10 +172,10 @@ void limpiar(tNodo *base){
 * void
 *****/
 void liberar_arbol(tNodo *base){
-    if (base == NULL){          //Caso base
+    if (base == NULL){          // Caso base
         return;
     }
-    liberar_arbol(base->izq);                    //Buscar
+    liberar_arbol(base->izq);                    // Buscar
     liberar_arbol(base->der);
     free(base->valor_polinomio.coeficiente);
     free(base->valor_polinomio.exponente);
@@ -338,48 +340,48 @@ int coeficiente(tABB arbol, int pos, float expo){
 }
 
 int main(){
-    FILE *archivo = fopen("entradaPolinomio.txt", "r");        //Entrada
+    FILE *archivo = fopen("entradaPolinomio.txt", "r");        // Entrada
     int cant_pol;
     int i, tam_pol, j;
     unsigned int exp, coef, half;
-    fscanf(archivo, "%d", &cant_pol);                //Leer cantidad de polinomios
+    fscanf(archivo, "%d", &cant_pol);                // Leer cantidad de polinomios
     tABB arbol;
     arbol = initialize(cant_pol);
     arbol.Size = cant_pol;
     for (i=0; i<cant_pol; i++){
         fscanf(archivo, "%d", &tam_pol);
-        pol polinom;                                //Crear polinomomio actual tipo pol
+        pol polinom;                                // Crear polinomomio actual tipo pol
         polinom.tam = tam_pol;
         polinom.pos = i;
         polinom.exponente = (unsigned int *)malloc(sizeof(unsigned int)* tam_pol);
         polinom.coeficiente = (int *)malloc(sizeof(int)* tam_pol);
-        for (j=0; j<tam_pol; j++){                      //Crear arreglos de exponente y coeficientes
+        for (j=0; j<tam_pol; j++){                      // Crear arreglos de exponente y coeficientes
             fscanf(archivo, "%u %u", &exp, &coef);
             polinom.exponente[j] = exp;
             polinom.coeficiente[j] = coef;
         }
         half = (unsigned int) (cant_pol / 2);
-        asignar(arbol.raiz, polinom, half);             //Asignar en el arbol
+        asignar(arbol.raiz, polinom, half);             // Asignar en el arbol
     }
-    limpiar(arbol.raiz);                                //Limpiar nodos inutilizados
+    limpiar(arbol.raiz);                                // Limpiar nodos inutilizados
     char funcion[13];
     char pp1[]="EVALUAR";
     char pp2[]="COEFICIENTE";
     int posleido;
     float valorleido;
     FILE *salida;
-    salida=fopen("salidaPolinomio.txt","w");                                      //crea el archivo de salida
-    fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);                   //lee archivo y almacena los valores en las valiares asignadas
-    while(!feof(archivo)){                                                        //comprueba que no se haya llegado al EOF
-        if (strncmp(funcion,pp1,7)==0){                                           //verifica si lo que se pide es EVALUAR
-            float resul = evaluar(arbol, posleido, valorleido);                   //evalua segun lo pedido
-            fprintf(salida,"%.6f\n",resul);                                       //escribe el resultado en el texto de salida
+    salida=fopen("salidaPolinomio.txt","w");                                      // crea el archivo de salida
+    fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);                   // lee archivo y almacena los valores en las valiares asignadas
+    while(!feof(archivo)){                                                        // comprueba que no se haya llegado al EOF
+        if (strncmp(funcion,pp1,7)==0){                                           // verifica si lo que se pide es EVALUAR
+            float resul = evaluar(arbol, posleido, valorleido);                   // evalua segun lo pedido
+            fprintf(salida,"%.6f\n",resul);                                       // escribe el resultado en el texto de salida
         }
-        else if(strncmp(funcion,pp2,11)==0){                                      //verifica si lo que se pide es COEFICIENTE
-            int resul = coeficiente(arbol, posleido, valorleido);                 //aplica la funcion segun lo pedido
-            fprintf(salida,"%d\n",resul);                                         //escribe el resultado en el texto de salida
+        else if(strncmp(funcion,pp2,11)==0){                                      // verifica si lo que se pide es COEFICIENTE
+            int resul = coeficiente(arbol, posleido, valorleido);                 // aplica la funcion segun lo pedido
+            fprintf(salida,"%d\n",resul);                                         // escribe el resultado en el texto de salida
         }
-        fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);               //lee la siguiente linea del archivo
+        fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);               // lee la siguiente linea del archivo
     }
     fclose(salida);
     fclose(archivo);
