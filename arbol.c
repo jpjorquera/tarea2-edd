@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 typedef struct polinomio {          // Estructura que almacena
     int tam;                        // tamano, posicion de ingreso
@@ -48,27 +49,6 @@ void crear_arbol(tNodo *base, unsigned int cant_hijos){
     crear_arbol(base->der, cant_hijos);
 }
 
-/*****
-* unsigned int power
-******
-* Calcular potencia de un numero
-******
-* Input:
-* int x : base de la potencia
-* unsigned int y : exponente de la potencia
-******
-* Returns:
-* unsigned int, valor final de la potencia
-*****/
-unsigned int power(int x, unsigned int y)
-{
-    if( y == 0)
-        return 1;
-    else if (y%2 == 0)
-        return power(x, y/2)*power(x, y/2);
-    else
-        return x*power(x, y/2)*power(x, y/2);
-}
 
 /*****
 * tABB initialize
@@ -87,7 +67,7 @@ tABB initialize(int cantPol){
     unsigned int h = 0;
     unsigned int nodos = 0;
     while (cantPol > nodos){                    // Calcular hijos de cada nivel
-        nodos += power(2, h++);
+        nodos += pow(2, h++);
     }
     crear_arbol(tree.raiz, nodos-1);
     return tree;
