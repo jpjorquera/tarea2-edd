@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 typedef struct polinomio {          // Estructura que almacena
     int tam;                        // tamano, posicion de ingreso
@@ -48,27 +49,6 @@ void crear_arbol(tNodo *base, unsigned int cant_hijos){
     crear_arbol(base->der, cant_hijos);
 }
 
-/*****
-* unsigned int power
-******
-* Calcular potencia de un numero
-******
-* Input:
-* int x : base de la potencia
-* unsigned int y : exponente de la potencia
-******
-* Returns:
-* unsigned int, valor final de la potencia
-*****/
-unsigned int power(int x, unsigned int y)
-{
-    if( y == 0)
-        return 1;
-    else if (y%2 == 0)
-        return power(x, y/2)*power(x, y/2);
-    else
-        return x*power(x, y/2)*power(x, y/2);
-}
 
 /*****
 * tABB initialize
@@ -87,7 +67,7 @@ tABB initialize(int cantPol){
     unsigned int h = 0;
     unsigned int nodos = 0;
     while (cantPol > nodos){                    // Calcular hijos de cada nivel
-        nodos += power(2, h++);
+        nodos += pow(2, h++);
     }
     crear_arbol(tree.raiz, nodos-1);
     return tree;
@@ -267,19 +247,19 @@ void ordenarpol (int * A, int * B , int N, int arreglo[][2], int * C){
 }
 
 /*****
-* float evaluar
+* double evaluar
 ******
 * evalua el polinomio a traves del algoritmo de horner, segun el valor pedido
 ******
 * Input:
 * tABB arbol : arbol binario que contiene a todos los polinomios
 * int posicion : posicion del polinomio que se quiere evaluar
-* float evaluado : el valor al cual se quiere evaluar el polinomio de la posicion determinada
+* double evaluado : el valor al cual se quiere evaluar el polinomio de la posicion determinada
 ******
 * Returns:
-* float, resultado numerico de la evaluacion del polinomio
+* double, resultado numerico de la evaluacion del polinomio
 *****/
-float evaluar(tABB arbol, int posicion, float evaluado){
+double evaluar(tABB arbol, int posicion, double evaluado){
     pol elemento = movetopost(arbol, posicion)->valor_polinomio;
     int exponen[elemento.tam];
     int exponen2[elemento.tam];
@@ -292,9 +272,9 @@ float evaluar(tABB arbol, int posicion, float evaluado){
     }
     int elem[elemento.tam][2];
     ordenarpol(exponen2, coee, elemento.tam, elem, exponen);
-    float raiz = 0;
-    float coef = elem[0][1];
-    float poli = coef + raiz;
+    double raiz = 0;
+    double coef = elem[0][1];
+    double poli = coef + raiz;
     int i;
     for(i=1;i<elemento.tam;i++){
         int a = elem[i-1][0]-elem[i][0];
@@ -328,7 +308,7 @@ float evaluar(tABB arbol, int posicion, float evaluado){
 * Returns:
 * int, retorna el valor del coeficiente pedido, si no existe el monomio del coeficiente, retorna 0
 *****/
-int coeficiente(tABB arbol, int pos, float expo){
+int coeficiente(tABB arbol, int pos, double expo){
     pol elemento = movetopost(arbol, pos)->valor_polinomio;
     int i;
     for(i=0;i<elemento.tam;i++){
@@ -368,20 +348,20 @@ int main(){
     char pp1[]="EVALUAR";
     char pp2[]="COEFICIENTE";
     int posleido;
-    float valorleido;
+    double valorleido;
     FILE *salida;
     salida=fopen("salidaPolinomio.txt","w");                                      // crea el archivo de salida
-    fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);                   // lee archivo y almacena los valores en las valiares asignadas
+    fscanf(archivo,"%s %d %lf",funcion, &posleido, &valorleido);                   // lee archivo y almacena los valores en las valiares asignadas
     while(!feof(archivo)){                                                        // comprueba que no se haya llegado al EOF
         if (strncmp(funcion,pp1,7)==0){                                           // verifica si lo que se pide es EVALUAR
-            float resul = evaluar(arbol, posleido, valorleido);                   // evalua segun lo pedido
-            fprintf(salida,"%.6f\n",resul);                                       // escribe el resultado en el texto de salida
+            double resul = evaluar(arbol, posleido, valorleido);                   // evalua segun lo pedido
+            fprintf(salida,"%.6lf\n",resul);                                       // escribe el resultado en el texto de salida
         }
         else if(strncmp(funcion,pp2,11)==0){                                      // verifica si lo que se pide es COEFICIENTE
             int resul = coeficiente(arbol, posleido, valorleido);                 // aplica la funcion segun lo pedido
             fprintf(salida,"%d\n",resul);                                         // escribe el resultado en el texto de salida
         }
-        fscanf(archivo,"%s %d %f",funcion, &posleido, &valorleido);               // lee la siguiente linea del archivo
+        fscanf(archivo,"%s %d %lf",funcion, &posleido, &valorleido);               // lee la siguiente linea del archivo
     }
     fclose(salida);
     fclose(archivo);

@@ -1,5 +1,5 @@
-Jorge Contreras, 201573547-6, Paralelo 200, funciones evaluar, coeficiente, ordenarpol, intercambiar, movetopost, main. Tanto en arbol como en lista.
+Jorge Ignacio Contreras Cabrera, 201573547-6, Paralelo 200, funciones evaluar, coeficiente, ordenarpol, intercambiar, movetopost, main. Tanto en arbol como en lista.
 
-Juan Jorquera, 201573533-6, Paralelo 200, struct polinomio, nodo, abb-lista, funciones crear_arbol, power, initialize, asignar, limpiar, liberar_arbol, movetopost, free_linked, main. Tanto en arbol como en lista.
+Juan Pablo Jorquera Zapata, 201573533-6, Paralelo 200, struct polinomio, nodo, abb-lista, funciones crear_arbol, initialize, asignar, limpiar, liberar_arbol, movetopost, free_linked, main. Tanto en arbol como en lista.
 
-Eliecer Zambrano, 201573540-9, Paralelo 201, funciones evaluar, coeficiente, ordenarpol, intercambiar, movetopost, main. Tanto en arbol como en lista.
+Eliecer Marcial Zambrano Reyes, 201573540-9, Paralelo 201, funciones evaluar, coeficiente, ordenarpol, intercambiar, movetopost, main. Tanto en arbol como en lista.
