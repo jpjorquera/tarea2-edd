@@ -1,0 +1,2 @@
+Agregar
+Nombre, ROL, Paralelo y qué programó cada integrante del grupo.
